@@ -1,0 +1,86 @@
+TITLE
+Op_cross_w_shielding
+* Sets the max limit of regions
+GLOBAL         5000.
+* Set the defaults for precision simulations
+DEFAULTS                                                              PRECISIO
+* Define the beam characteristics, E = 70 keV to not interfere with spectrum
+BEAM          -7E-05                            1.        1.          PHOTON
+* Source file for 66kVp spectrum
+SOURCE
+* Defining the beam position
+BEAMPOS          0.0       0.0       30.
+* Rotating the patient for correct beam placement
+ROT-DEFI        101.      180.       90.                              rotpat
+* Rotating the lead screen for correct placement
+*
+ROT-DEFI        102.       30.                                        rotScr
+GEOBEGIN                                                              COMBNAME
+* Voxel cage representing patient
+VOXELS          -30.-128.96484     -150.    rotpat                    par
+    0    0          
+$start_transform rotpat
+$end_transform 
+* Black body
+SPH blkbody    0.0 0.0 0.0 100000.
+* Void sphere
+SPH void       0.0 0.0 0.0 10000.
+* Defining the floor in the procedure room
+RPP floor      -150. 250. -250. 350. -10. 0.0
+* Operator's body
+RCC opBody     56. 50. 0.0 0.0 0.0 155. 15.
+* Operator's head
+RCC opHead     56. 50. 154. 0.0 0.0 26. 10.
+* Lead skirt up to table
+RPP bedSki1    40. 40.05 0. 132. 4. 90.
+* Lead skirt from table to patient height
+RPP bedSki2    40. 40.05 0. 90. 89. 102.
+$start_transform rotScr
+* Lead screen from patient height to top
+RPP leadScr1   -15. 63. 15. 15.05 128.97484 190.97484
+* Lead screen path middle
+RPP leadScr2   26. 63. 15. 15.05 113.98484 128.98484
+* Lead screen patch furthest away from patient
+RPP leadScr3   44.5 63. 15. 15.05 100. 113.99484
+$end_transform 
+END
+* Black hole
+BLKBODY      5 +blkbody -void
+* Void around
+VOID         5 +void -VOXEL-opHead -opBody-bedSki1 -bedSki2 -leadScr1-leadScr2-leadScr3 -floor
+* Floor region
+!@alpha=90
+floor        5 +floor
+OPERATOR     5 +opBody|opHead
+* Defining lead skirt region
+bedScr       5 +bedSki1|bedSki2
+* Defining lead screen region
+leadScr      5 +leadScr1|leadScr2|leadScr3
+END
+GEOEND
+ASSIGNMA    BLCKHOLE   BLKBODY
+ASSIGNMA         AIR      VOID
+* Material for floor
+MATERIAL                             2.3                              CONCRETE
+* Creating concrete for floor
+COMPOUND        23.0    CARBON      40.0    OXYGEN      12.0   SILICONCONCRETE
+COMPOUND        12.0   CALCIUM      10.0  HYDROGEN       2.0  MAGNESIUCONCRETE
+* Assigning material to floor
+ASSIGNMA    CONCRETE     floor
+ASSIGNMA        PMMA  OPERATOR
+* Assigning material to lead skirt
+ASSIGNMA        LEAD    bedScr
+* Assigning material to lead screen
+ASSIGNMA        LEAD   leadScr
+* Energy cut off at 1keV
+EMFCUT        -1E-06      1E-6                VOID  @LASTREG
+* Scoring of fluence
+USRBIN           10.    PHOTON      -22.      200.      250.      250.flu1
+USRBIN         -100.     -100.       0.0      150.      175.      125. &
+* Activate the MGDRAW routine
+USERDUMP        100.                 0.0        1.
+* Random number
+RANDOMIZ          1.
+* Number of primary photons to be simulated in the run
+START     1000000000
+STOP
