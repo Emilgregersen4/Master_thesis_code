@@ -1,0 +1,46 @@
+TITLE
+Ct-image_Patient
+* Sets the max limit of regions
+GLOBAL         5000.
+* Set the defaults for precision simulations
+DEFAULTS                                                              PRECISIO
+* Define the beam characteristics, E = 70 keV to not interfere with spectrum
+BEAM          -7E-05                            1.        1.          PHOTON
+* Source file for 66kVp spectrum
+SOURCE
+* Defining the beam position
+BEAMPOS          0.0       0.0       30.
+* Rotating the patient for correct beam placement
+ROT-DEFI        100.      180.       90.                              rot1
+GEOBEGIN                                                              COMBNAME
+* Voxel cage representing patient
+VOXELS          -30. -128.9848     -150.      rot1                    par
+    0    0          
+* Rotation of the patient
+$start_transform rot1
+$end_transform 
+* Black body
+SPH blkbody    0.0 0.0 0.0 100000.
+* Void sphere
+SPH void       0.0 0.0 0.0 10000.
+END
+* Black hole
+BLKBODY      5 +blkbody -void
+* Void around
+VOID         5 +void -VOXEL
+END
+GEOEND
+ASSIGNMA    BLCKHOLE   BLKBODY
+ASSIGNMA         AIR      VOID
+* Energy cut off at 1keV
+EMFCUT        -1E-06      1E-6                VOID  @LASTREG
+* Scoring of fluence
+USRBIN           10.    PHOTON      -22.       50.      200.      200.flu1
+USRBIN          -50.     -100.        0.       50.      150.      100. &
+* Activate the MGDRAW routine
+USERDUMP        100.                 0.0        1.
+* Random number
+RANDOMIZ          1.
+* Number of primary photons to be simulated in the run
+START       1000000.
+STOP
