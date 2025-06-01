@@ -3,7 +3,7 @@ The folders in the repository contain the files used in my master's thesis for t
 
 The tracking code was made with Fortran 77, and all .f files contain tracking code
 
-inp files are the input files where all the cards were determined for setting up the simulation
+.inp files are the input files where all the cards were determined for builiding the simulation setups
 
 Sourcev01.f file is the fortran file used for initializing the spectrum
 
