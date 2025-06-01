@@ -1,0 +1,39 @@
+TITLE
+PMMA_phantom_50keV/66kvP
+* Set the defaults for precision simulations
+DEFAULTS                                                              PRECISIO
+* Defining the beam characteristics, E=50keV without spectrum
+BEAM          -7E-05                            1.        1.          PHOTON
+* Source file for 66kVp spectrum
+SOURCE
+* Defining the beam position
+BEAMPOS          0.0       0.0       30.
+GEOBEGIN                                                              COMBNAME
+    0    0          
+* Black body
+SPH blkbody    0.0 0.0 0.0 100000.
+* Void sphere
+SPH void       0.0 0.0 0.0 10000.
+* Cylindrical target
+RCC Cylinder   0.0 0.0 90.0 0.0 0.0 16.0 16.0
+END
+* Black hole
+BLKBODY      5 +blkbody -void
+* Void around
+VOID         5 +void -Cylinder
+* PMMA phantom region
+TARGET       5 +Cylinder
+END
+GEOEND
+ASSIGNMA    BLCKHOLE   BLKBODY
+ASSIGNMA         AIR      VOID
+ASSIGNMA        PMMA    TARGET
+* Energy cut off at 1keV
+EMFCUT        -1E-06      1E-6                VOID  @LASTREG
+* Activate the MGDRAW routine
+USERDUMP        100.                 0.0        1.
+* Random number
+RANDOMIZ          1.
+* Number of primary photons to be simulated in the run
+START       1000000.
+STOP
