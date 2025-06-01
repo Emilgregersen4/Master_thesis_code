@@ -1,0 +1,52 @@
+TITLE
+Patient x operator
+* Sets the max limit of regions
+GLOBAL         5000.
+* Set the defaults for precision simulations
+DEFAULTS                                                              PRECISIO
+* Define the beam characteristics, E = 70 keV to not interfere with spectrum
+BEAM          -7E-05                            1.        1.          PHOTON
+* Source file for 66kVp spectrum
+SOURCE
+* Defining the beam position
+BEAMPOS          0.0       0.0       30.
+* Rotating the patient for correct beam placement
+ROT-DEFI        100.      180.       90.                              rot1
+GEOBEGIN                                                              COMBNAME
+* Voxel cage representing patient
+VOXELS          -30. -128.9848     -150.      rot1                    j_c
+    0    0          
+$start_transform rot1
+$end_transform 
+* Black body
+SPH blkbody    0.0 0.0 0.0 100000.0
+* Void sphere
+SPH void       0.0 0.0 0.0 10000.0
+* Operator's body
+RCC opBody     56. 50. 0.0 0.0 0.0 155. 15.
+* Operator's head
+RCC opHead     56. 50. 154. 0.0 0.0 26. 10.
+END
+* Black hole
+BLKBODY      5 +blkbody -void
+* Void around
+VOID         5 +void -VOXEL-opHead -opBody
+OPERATOR     5 +opBody|opHead
+END
+GEOEND
+ASSIGNMA    BLCKHOLE   BLKBODY
+ASSIGNMA         AIR      VOID
+* Assigning material to operator
+ASSIGNMA        PMMA  OPERATOR
+* Energy cut off at 1keV
+EMFCUT        -1E-06      1E-6                VOID  @LASTREG
+* Scoring of fluence
+USRBIN           10.    PHOTON      -22.      125.      200.      200.flu1
+USRBIN         -125.     -100.        0.      125.      150.      100. &
+* Activate the MGDRAW routine
+USERDUMP        100.                 0.0        1.
+* Random number
+RANDOMIZ          1.
+* Number of primary photons to be simulated in the run
+START     100000000.
+STOP
