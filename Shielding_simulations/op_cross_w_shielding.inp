@@ -82,5 +82,5 @@ USERDUMP        100.                 0.0        1.
 * Random number
 RANDOMIZ          1.
 * Number of primary photons to be simulated in the run
-START     1000000000
+START     6000000000
 STOP
